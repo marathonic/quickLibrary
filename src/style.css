@@ -100,3 +100,8 @@ button {
 button:focus {
     background-color: lightcoral;
 }
+
+button:hover {
+    cursor: pointer;
+    background-color: rgb(104, 173, 192);
+}

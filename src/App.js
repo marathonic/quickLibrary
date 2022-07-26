@@ -1,27 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BookList from "./components/BookList";
+import { nanoid } from "nanoid";
 
 export default function App() {
-  const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState(
+    JSON.parse(localStorage.getItem("books")) || []
+  );
   const [newBook, setNewBook] = useState({
     title: "",
     author: "",
+    id: "",
   });
   const [repeatNotice, setRepeatNotice] = useState(false);
 
-  //   const [title, setTitle] = useState("");
-  //   const [author, setAuthor] = useState("");
+  useEffect(() => {
+    localStorage.setItem("books", JSON.stringify(books));
+  }, [books]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewBook({
       ...newBook,
       [name]: value,
+      id: nanoid(),
     });
   };
 
   const updateBooks = () => {
     setBooks((prevBooks) => {
+      // we can just use the key, if we make each id just be the title + author, e.g: id === 'harrypotterjkrowling'.
       if (prevBooks.includes(newBook)) {
         setRepeatNotice(true);
         return prevBooks;
@@ -29,6 +36,13 @@ export default function App() {
         setRepeatNotice(false);
         return [...prevBooks, newBook];
       }
+    });
+  };
+
+  const deleteBook = (bookId) => {
+    setBooks((prevBooks) => {
+      const filtered = prevBooks.filter((book) => book.id !== bookId);
+      return filtered;
     });
   };
 
@@ -80,11 +94,12 @@ export default function App() {
               <tr>
                 <th>Title</th>
                 <th>Author</th>
+                <th>Delete</th>
               </tr>
             </thead>
 
             <tbody>
-              <BookList books={books} />
+              <BookList books={books} deleteBook={deleteBook} />
             </tbody>
           </table>
         </div>
